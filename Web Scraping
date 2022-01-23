@@ -1,0 +1,129 @@
+# import libraries 
+
+from bs4 import BeautifulSoup
+import requests
+import time
+import datetime
+
+import smtplib
+
+#connecting to a website
+
+url = 'https://www.amazon.in/PS4-God-of-War/dp/B07YQ73Y8T/ref=sr_1_2?keywords=ps4%2Bgame&qid=1642854585&sr=8-2'
+header = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"}
+
+#getting the data from the website
+page = requests.get(url, headers=header)
+
+s1 = BeautifulSoup(page.content,'html.parser')
+s2 = BeautifulSoup(s1.prettify(),'html.parser')
+
+title = s2.find('span','a-size-large product-title-word-break').get_text()
+print(title)
+price = s2.find('span', 'a-offscreen').get_text()
+print(price)
+
+#removing the rupee sign from the price
+
+price = price.strip()[1:]
+title = title.strip()
+
+print(title,price)
+
+today = datetime.date.today()
+print(today)
+
+
+#saving the data from the amazon website into a csv file
+import csv 
+
+h1 = ['Title','Price','Date']
+data = [title,price,today]
+
+with open('Scrapper_file.csv','w',newline='',encoding='UTF8') as f:
+    writer = csv.writer(f)
+    writer.writerow(h1)
+    writer.writerow(data)
+    
+    
+ #import pandas
+
+#df = pd.read_csv('/Users/digi/Desktop/Data-Analytics/web-scrapper/Scrapper_file.csv')
+
+#df.head(10)
+
+#checking if the apending works
+
+with open('Scrapper_file.csv','a+',newline='',encoding='UTF8') as f:
+        writer = csv.writer(f)
+        writer.writerow(data)
+        
+Automation
+
+This function basically automates the entire process and keeps on updating the csv file on its on.
+
+#automating the process
+
+def automate():
+    url = 'https://www.amazon.in/PS4-God-of-War/dp/B07YQ73Y8T/ref=sr_1_2?keywords=ps4%2Bgame&qid=1642854585&sr=8-2'
+    header = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"}
+
+    page = requests.get(url, headers=header)
+
+    s1 = BeautifulSoup(page.content,'html.parser')
+    s2 = BeautifulSoup(s1.prettify(),'html.parser')
+
+    title = s2.find('span','a-size-large product-title-word-break').get_text()
+    price = s2.find('span', 'a-offscreen').get_text()
+    price = price.strip()[1:]
+    title = title.strip()
+    
+    import datetime
+    today = datetime.date.today()
+
+    import csv 
+
+    h1 = ['Title','Price','Date']
+    data = [title,price,today]
+
+    with open('Scrapper_file.csv','a+',newline='',encoding='UTF8') as f:
+        writer = csv.writer(f)
+        writer.writerow(data)
+    #if (price < 900):
+     #   send_mail()
+     
+  Loop to keep the scrapper running
+
+Here I have used just 1 second gap inorder to get the data and validate it fastly you can use any time interval but take note that the time is in seconds
+
+In [10]:
+#loop that keeps the process running after a defined interval
+#note here time.sleep() is in seconds
+#while(True):
+#    automate()
+#    time.sleep(1) #unit is seconds
+Function to send Mail to yourself
+
+I tried to send mail to myself while doing the project and at first it doesn’t work because google won't allow unauthorised app to access your mail so for the first time you will have to allow it manually after that it seems to work fine.
+
+In [11]:
+linkcode
+#sending a mail if the product gets available or there is a price drop
+
+def send_mail():
+    server = smtplib.SMTP_SSL('smtp.gmail.com',465)
+    server.ehlo()
+    #server.starttls()
+    server.ehlo()
+    server.login('enter email','@@@@@')
+    
+    subject = "Price Drop Alert!"
+    body = "God of War-PS4 just dropped in price might want to have a look"
+   
+    msg = f"Subject: {subject}\n\n{body}"
+    
+    server.sendmail(
+        'enter email',
+        msg
+     
+    )
